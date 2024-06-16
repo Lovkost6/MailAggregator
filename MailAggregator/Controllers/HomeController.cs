@@ -133,4 +133,20 @@ public class HomeController : Controller
             return incomingMail;
         }
     }
+
+    [HttpPost]
+    public IActionResult OpenBody(string subject, string body, string from, string getAt)
+    {
+        var message = new OpenBodyViewModel
+        {
+            Subject = subject,
+            Body = body,
+            From = from,
+            GetAt = getAt
+        };
+        var messageJson = JsonSerializer.Serialize(message);
+        HttpContext.Session.SetString("123",messageJson);
+        
+        return RedirectToAction("Index", "OpenBody");
+    }
 }

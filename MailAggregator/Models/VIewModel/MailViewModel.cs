@@ -9,7 +9,11 @@ public class MailViewModel
     public List<IncomingMail>? IncomingMails { get; set; }
     public string? SelectedEmail { get; set; }
     public string? Server { get; set; }
-
+    
+    public string? Subject { get; set; }
+    public string? Body { get; set; }
+    public string? From { get; set; }
+    public string? GetAt { get; set; }
     public string? FolderName { get; set; } = "INBOX";
 
     public int CurrentPage { get; set; } = 1;

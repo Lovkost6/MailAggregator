@@ -1,0 +1,37 @@
+﻿@model MessageViewModel
+
+@{
+ViewBag.Title = "Написать сообщени";
+}
+
+<h2>Написать сообщени</h2>
+
+@using (Html.BeginForm())
+{
+@Html.AntiForgeryToken()
+
+<div class="form-group">
+    @Html.LabelFor(model => model.SelectedFromEmail, "From", new { @class = "control-label" })
+    @Html.DropDownListFor(model => model.SelectedFromEmail, new SelectList(Model.FromEmails), "Выберите почту", new { @class = "form-control" })
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(model => model.ToEmail, "To", new { @class = "control-label" })
+    @Html.TextBoxFor(model => model.ToEmail, new { @class = "form-control" })
+    @Html.ValidationMessageFor(model => model.ToEmail, "", new { @class = "text-danger" })
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(model => model.Subject, "Subject", new { @class = "control-label" })
+    @Html.TextBoxFor(model => model.Subject, new { @class = "form-control" })
+    @Html.ValidationMessageFor(model => model.Subject, "", new { @class = "text-danger" })
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(model => model.Body, "Message", new { @class = "control-label" })
+    @Html.TextAreaFor(model => model.Body, new { @class = "form-control", rows = 5 })
+    @Html.ValidationMessageFor(model => model.Body, "", new { @class = "text-danger" })
+</div>
+
+<button type="submit" class="btn btn-primary">Отправить</button>
+}

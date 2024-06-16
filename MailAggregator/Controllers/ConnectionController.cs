@@ -7,12 +7,12 @@ using MailService = MailAggregator.Service.MailService;
 
 namespace MailAggregator.Controllers;
 
-public class CreateController : Controller
+public class ConnectionController : Controller
 {
     private readonly ServerService _serverService;
     private readonly MailService _mailService;
 
-    public CreateController(ServerService serverService, MailService mailService)
+    public ConnectionController(ServerService serverService, MailService mailService)
     {
         _serverService = serverService;
         _mailService = mailService;
@@ -25,7 +25,9 @@ public class CreateController : Controller
         try
         {
             await client.ConnectAsync(host.Server, host.Port, true);
+            Console.WriteLine(client.IsConnected);
             await client.AuthenticateAsync (email, password);
+            Console.WriteLine(client.IsAuthenticated);
         }
         catch (Exception e)
         {

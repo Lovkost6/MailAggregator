@@ -66,6 +66,7 @@ public class HomeController : Controller
 
     private async Task<List<IncomingMail>>? GetIncomingMail(MailViewModel mailViewModel, string key)
     {
+        IMailFolder inbox;
         var host = (await _serverService.GetAsync())
             .FirstOrDefault(x => x.Name == mailViewModel.Server && x.Type == "inbox");
 
@@ -77,12 +78,22 @@ public class HomeController : Controller
         {
             await client.ConnectAsync(host.Server, host.Port, true);
             await client.AuthenticateAsync(mailViewModel.SelectedEmail, email.Password);
-
-
+            if (mailViewModel.FolderName != "INBOX")
+            {
+                Enum.TryParse(mailViewModel.FolderName, out SpecialFolder  specialFolder);
+                inbox = client.GetFolder(specialFolder);
+            }
+            else
+            {
+                inbox = await client.GetFolderAsync(mailViewModel.FolderName);
+                
+            }
+            
+            
             // The Inbox folder is always available on all IMAP servers...
-            var inbox = await client.GetFolderAsync(mailViewModel.FolderName);
             await inbox.OpenAsync(FolderAccess.ReadOnly);
-
+            
+            
             int inboxCount;
 
             if (_redis.KeyExists(inboxKey))
@@ -92,7 +103,7 @@ public class HomeController : Controller
             else
             {
                 inboxCount = inbox.Count;
-                _redis.StringSetAsync(inboxKey, inboxCount);
+                _redis.StringSetAsync(inboxKey, inboxCount, TimeSpan.FromMinutes(5));
             }
             
             var pages = Math.Ceiling(inboxCount/ (double)mailViewModel.PageSize);
@@ -117,7 +128,7 @@ public class HomeController : Controller
             await client.DisconnectAsync(true);
             var value = new CacheMailValue { IncomingMails = incomingMail, PagesCount = mailViewModel.PagesCount };
             var jsonValue = JsonSerializer.Serialize(value);
-            _redis.StringSetAsync(key, jsonValue);
+            _redis.StringSetAsync(key, jsonValue,TimeSpan.FromMinutes(5));
 
             return incomingMail;
         }

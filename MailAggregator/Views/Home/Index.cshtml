@@ -1,4 +1,5 @@
-﻿@model MailViewModel
+﻿@using MailKit
+@model MailViewModel
 @{
     ViewData["Title"] = "Home Page";
     var nextPage =  Model.CurrentPage + 1;
@@ -6,11 +7,30 @@
 }
 
 <div class="container">
-    <div class="text-start">
-        @if (string.IsNullOrEmpty(Model.SelectedEmail) == false)
-        {
+    <div class="row">
+        <div class="col-2">
+            @if (Model.Mails.Count == 0)
+            {
+                <div class="badge bg-primary text-wrap" style="width: 6rem;">Нет добавленных почтовых ящиков</div>
+            }
+
+
+            @foreach (var item in Model.Mails)
+            {
+                <form asp-controller="Home" asp-action="Index" method="get">
+                    <button type="submit" class="btn btn-primary">@($"{item.Email}  {item.Server}")</button>
+                    <input hidden="hidden" asp-for="SelectedEmail" value="@item.Email"/>
+                    <input hidden="hidden" asp-for="FolderName" value="@Model.FolderName"/>
+                    <input hidden="hidden" asp-for="Server" value="@item.Server"/>
+                </form>
+            }
+
+        </div>
+
+        <div class="col">
+            @if (string.IsNullOrEmpty(Model.SelectedEmail) == false)
+            {
             <div class="row">
-                <div class="col">Подключенные почтовые ящики</div>
                 <div class="col">
                     <form asp-controller="Home" asp-action="Index" method="get">
                         <button type="submit" class="btn btn-primary">Входящие</button>
@@ -23,7 +43,7 @@
                     <form asp-controller="Home" asp-action="Index" method="get">
                         <button type="submit" class="btn btn-primary">Исходящие</button>
                         <input hidden="hidden" asp-for="SelectedEmail" value="@Model.SelectedEmail"/>
-                        <input hidden="hidden" asp-for="FolderName" value="Sent"/>
+                        <input hidden="hidden" asp-for="FolderName" value="@SpecialFolder.Sent"/>
                         <input hidden="hidden" asp-for="Server" value="@Model.Server"/>
                     </form>
                 </div>
@@ -31,7 +51,7 @@
                     <form asp-controller="Home" asp-action="Index" method="get">
                         <button type="submit" class="btn btn-primary">Спам</button>
                         <input hidden="hidden" asp-for="SelectedEmail" value="@Model.SelectedEmail"/>
-                        <input hidden="hidden" asp-for="FolderName" value="Spam"/>
+                        <input hidden="hidden" asp-for="FolderName" value="@SpecialFolder.Junk"/>
                         <input hidden="hidden" asp-for="Server" value="@Model.Server"/>
                     </form>
                 </div>
@@ -39,57 +59,37 @@
                     <form asp-controller="Home" asp-action="Index" method="get">
                         <button type="submit" class="btn btn-primary">Удаленные</button>
                         <input hidden="hidden" asp-for="SelectedEmail" value="@Model.SelectedEmail"/>
-                        <input hidden="hidden" asp-for="FolderName" value="Drafts"/>
+                        <input hidden="hidden" asp-for="FolderName" value="@SpecialFolder.Trash"/>
                         <input hidden="hidden" asp-for="Server" value="@Model.Server"/>
                     </form>
                 </div>
 
             </div>
-        }
-        <div class="row">
-            <div class="col-2">
-                @if (Model.Mails.Count == 0)
+            }
+            <div class="container">
+                @if (Model.IncomingMails == null)
                 {
-                    <div class="badge bg-primary text-wrap" style="width: 6rem;">Нет добавленных почтовых ящиков</div>
+                    <p class="text-lg-center">Нет полученных сообщений</p>
                 }
-
-
-                @foreach (var item in Model.Mails)
+                else
                 {
-                    <form asp-controller="Home" asp-action="Index" method="get">
-                        <button type="submit" class="btn btn-primary">@item.Email@item.Server</button>
-                        <input hidden="hidden" asp-for="SelectedEmail" value="@item.Email"/>
-                        <input hidden="hidden" asp-for="FolderName" value="@Model.FolderName"/>
-                        <input hidden="hidden" asp-for="Server" value="@item.Server"/>
-                    </form>
-                }
-
-            </div>
-
-            <div class="col">
-                <div class="container">
-                    @if (Model.IncomingMails == null)
+                    @foreach (var item in Model.IncomingMails)
                     {
-                        <div class="badge bg-primary text-wrap">Нет полученных сообщений</div>
+                        <div onclick="" class="text-center row rounded-pill border border-info">
+                            <div class="col">@item.From</div>
+                            @if (string.IsNullOrEmpty(@item.Subject))
+                            {
+                                <div class="col">(Без темы)</div>
+                            }
+                            else
+                            {
+                                <div class="col">@item.Subject</div>
+                            }
+                            <div class="col">@item.GetAt</div>
+                        </div>
                     }
-                    else
-                    {
-                        @foreach (var item in Model.IncomingMails)
-                        {
-                            <div onclick="" class="text-center row rounded-pill border border-info">
-                                <div class="col">@item.From</div>
-                                @if (string.IsNullOrEmpty(@item.Subject))
-                                {
-                                    <div class="col">(Без темы)</div>
-                                }
-                                else
-                                {
-                                    <div class="col">@item.Subject</div>
-                                }
-                                <div class="col">@item.GetAt</div>
-                            </div>
-                        }
-                        <div class="row">
+
+                    <div class="row">
                         <div class="col">
                             <form asp-controller="Home" asp-action="Index" method="get">
                                 <button type="submit" class="btn btn-primary" @(prevPage < 1 ? "disabled" : "")>Назад</button>
@@ -104,16 +104,15 @@
                         </div>
                         <div class="col">
                             <form asp-controller="Home" asp-action="Index" method="get">
-                                <button type="submit" class="btn btn-primary" @(nextPage>=Model.PagesCount ? "disabled" : "")>Дальше</button>
+                                <button type="submit" class="btn btn-primary" @(nextPage >= Model.PagesCount ? "disabled" : "")>Дальше</button>
                                 <input hidden="hidden" asp-for="SelectedEmail" value="@Model.SelectedEmail"/>
                                 <input hidden="hidden" asp-for="FolderName" value="@Model.FolderName"/>
                                 <input hidden="hidden" asp-for="Server" value="@Model.Server"/>
                                 <input hidden="hidden" asp-for="CurrentPage" value="@nextPage"/>
                             </form>
                         </div>
-                        </div>
-                    }
-                </div>
+                    </div>
+                }
             </div>
         </div>
     </div>

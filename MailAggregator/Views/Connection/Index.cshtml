@@ -1,0 +1,26 @@
+﻿@model EmailServerViewModel 
+@{
+    ViewData["Title"] = "Подключение";
+}
+
+
+<div class="container">
+    <h1>Create connection</h1>
+    <form asp-controller="Connection" asp-action="CreateEmailConnection" method="get">
+        <div class="row justify-content-lg-start">
+            <div class="col-md-auto">
+                <input type="text" asp-for="Email" class="input-group-text"/>
+            </div>
+            <div class="col-md-auto">
+                <select asp-for="Server" asp-items="Model.ServerName">
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <input type="text" asp-for="Password" class="input-group-text"/>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Подключить</button>
+    </form>
+</div>

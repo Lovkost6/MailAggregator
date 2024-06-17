@@ -150,7 +150,7 @@ public class HomeController : Controller
             GetAt = getAt
         };
         var messageJson = JsonSerializer.Serialize(message);
-        HttpContext.Session.SetString("123",messageJson);
+        HttpContext.Session.SetString("MessageBody",messageJson);
         
         return RedirectToAction("Index", "OpenBody");
     }

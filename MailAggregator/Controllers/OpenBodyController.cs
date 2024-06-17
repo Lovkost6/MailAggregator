@@ -9,7 +9,7 @@ public class OpenBodyController:Controller
     public IActionResult Index()
     {
 
-        var messageJson = HttpContext.Session.GetString("123");
+        var messageJson = HttpContext.Session.GetString("MessageBody");
         var message = JsonSerializer.Deserialize<OpenBodyViewModel>(messageJson);
         return View(message);
     }

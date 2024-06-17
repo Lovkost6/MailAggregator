@@ -12,4 +12,8 @@ public class Mail
     public required string Password { get; set; }
     
     public required string Server { get; set; }
+    
+    public required string UserEmail { get; set; }
+    
+    
 }

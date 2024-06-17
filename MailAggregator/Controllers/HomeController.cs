@@ -5,32 +5,37 @@ using MailAggregator.Models;
 using MailAggregator.Service;
 using MailKit;
 using MailKit.Net.Imap;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using StackExchange.Redis;
 using MailService = MailAggregator.Service.MailService;
 
 namespace MailAggregator.Controllers;
 
+[Authorize]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly MailService _mailService;
     private readonly ServerService _serverService;
+    private readonly UserService _userService;
     private readonly IDatabase _redis;
 
     public HomeController(ILogger<HomeController> logger, MailService mailService, ServerService serverService,
-        IConnectionMultiplexer muxer)
+        IConnectionMultiplexer muxer, UserService userService)
     {
         _logger = logger;
         _mailService = mailService;
         _serverService = serverService;
+        _userService = userService;
         _redis = muxer.GetDatabase();
     }
 
 
     public async Task<IActionResult> Index(MailViewModel mailViewModel)
     {
-        mailViewModel.Mails = await _mailService.GetAsync();
+        var currentUserEmail = HttpContext.User.Claims.Last().Value;
+        mailViewModel.Mails = await _mailService.GetByEmailAsync(currentUserEmail);
         if (mailViewModel.SelectedEmail == null || mailViewModel.Server == null)
         {
             return View(mailViewModel);

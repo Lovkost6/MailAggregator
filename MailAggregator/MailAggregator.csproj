@@ -4,11 +4,12 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-      <UserSecretsId>53e76e80-f749-4f9e-bc94-698e5c1f03f6</UserSecretsId>
+      <UserSecretsId>5b62bffb-0c52-4e43-a958-358ec578dc88</UserSecretsId>
   </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="MailKit" Version="4.6.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.6" />
       <PackageReference Include="MongoDB.Driver" Version="2.26.0" />
       <PackageReference Include="StackExchange.Redis" Version="2.7.33" />
     </ItemGroup>

@@ -1,12 +1,14 @@
 ﻿using MailAggregator.Models;
 using MailAggregator.Service;
 using MailKit.Net.Imap;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MailService = MailAggregator.Service.MailService;
 
 namespace MailAggregator.Controllers;
 
+[Authorize]
 public class ConnectionController : Controller
 {
     private readonly ServerService _serverService;
@@ -33,8 +35,10 @@ public class ConnectionController : Controller
         {
             return View( (object)e.Message);
         }
+        
+        var currentUserEmail = HttpContext.User.Claims.Last().Value;
 
-        await _mailService.CreateAsync(new Mail{Email = email, Password=password,Server = server});
+        await _mailService.CreateAsync(new Mail{Email = email, Password=password,Server = server, UserEmail = currentUserEmail});
 
         await client.DisconnectAsync (true);
         object str = "Connection to " + email + server + " success";

@@ -1,9 +1,10 @@
 using MailAggregator.Config;
 using MailAggregator.Service;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.Configure<MailDatabaseSettings>(
@@ -11,8 +12,19 @@ builder.Services.Configure<MailDatabaseSettings>(
 
 builder.Services.AddSingleton<MailService>();
 builder.Services.AddSingleton<ServerService>();
+builder.Services.AddSingleton<UserService>();
+
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379"));
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+}).AddCookie().AddGoogle(googleOptions =>
+{
+    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -28,6 +40,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

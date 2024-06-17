@@ -24,8 +24,8 @@ public class MailService
         public async Task<List<Mail>> GetAsync() =>
             await _emailsCollection.Find(_ => true).ToListAsync();
 
-        public async Task<Mail?> GetAsync(string id) =>
-            await _emailsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+        public async Task<List<Mail>> GetByEmailAsync(string email) =>
+            await _emailsCollection.Find(x => x.UserEmail == email).ToListAsync();
 
         public async Task CreateAsync(Mail newMail) =>
             await _emailsCollection.InsertOneAsync(newMail);

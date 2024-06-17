@@ -1,13 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-    </PropertyGroup>
+      <UserSecretsId>5b62bffb-0c52-4e43-a958-358ec578dc88</UserSecretsId>
+  </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="MailKit" Version="4.6.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.6" />
       <PackageReference Include="MongoDB.Driver" Version="2.26.0" />
       <PackageReference Include="StackExchange.Redis" Version="2.7.33" />
     </ItemGroup>

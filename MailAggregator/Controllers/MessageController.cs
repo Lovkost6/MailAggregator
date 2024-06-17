@@ -1,17 +1,18 @@
 ﻿using MailAggregator.Models;
 using MailAggregator.Service;
 using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
 using MongoDB.Driver.Linq;
 
 namespace MailAggregator.Controllers;
 
+[Authorize]
 public class MessageController : Controller
 {
     private readonly MailService _mailService;
-    private readonly ServerService _serverService;
-
+    private readonly ServerService _serverService; 
 
     public MessageController(MailService mailService, ServerService serverService)
     {
